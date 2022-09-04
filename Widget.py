@@ -5,8 +5,11 @@ from datetime import datetime
 
 root = tk.Tk()
 root.title("Weather Widget")
-root.geometry('300x250')
-root.configure(bg='#83C4CE')
+root.geometry('300x500')
+# root.configure(bg='#83C4CE')
+
+frame = Frame(root)
+frame.pack()
 
 WMO = {
     0: "Clear sky",
@@ -40,8 +43,10 @@ def format_time():
 
 class Widget:
 
-    def __init__(self, data):
+    def __init__(self, data, city):
         self.data = data
+        self.city = city
+
         self.wmos = self.data["hourly"]["weathercode"]
         self.times = self.data["hourly"]["time"]
         self.temps = self.data["hourly"]["temperature_2m"]
@@ -61,52 +66,105 @@ class Widget:
         time = format_time()
         index = self.times.index(time)
 
-        # Date:
-
         # Icon:
         print()
         img = Image.open("resources/sun.jpeg")
         img = img.resize((100, 100), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(img)
-        lbl_icon = Label(image=photo)
-        lbl_icon.image = photo
-        lbl_icon.place(x=10, y=10)
         print("Icon: sun.jpeg")
 
         # WMO:
         wmo = self.wmos[index]
-        lbl_wmo = Label(text=WMO[wmo])
-        lbl_wmo.place(x=140, y=70)
-        print("WMO: " + str(wmo))
+        print("WMO: " + WMO[wmo])
+
+        # city:
+        print(self.city)
 
         # temp:
         temp = str(self.temps[index]) + " °C"
-        lbl_temp = Label(text=temp)
-        lbl_temp.place(x=140, y=25)
         print("temp: " + str(temp))
 
-        # max temp:
+        # max and min temp:
         max = str(self.max_temps_daily[0]) + " °C"
-        lbl_max = Label(text=max)
-        lbl_max.place(x=140, y=25)
         print("max: " + str(max))
-
-        # min temp:
         min = str(self.min_temps_daily[0]) + " °C"
-        lbl_min= Label(text=min)
-        lbl_min.place(x=140, y=25)
         print("min: " + str(min))
+        max_min = "max.: " + max + ", min.: " + min
+
+
+        # Main Frame !!!:
+
+        top_left_frame = Frame(frame)
+        top_left_frame.pack(side=TOP)
+
+        lbl_icon = Label(top_left_frame, image=photo)
+        lbl_icon.pack(side=TOP)
+
+        lbl_city = Label(top_left_frame, text=self.city)
+        lbl_city.pack(side=TOP)
+
+        lbl_temp = Label(top_left_frame, text=temp)
+        lbl_temp.pack(side=TOP)
+
+        lbl_wmo = Label(top_left_frame, text=WMO[wmo])
+        lbl_wmo.pack(side=TOP)
+
+        lbl_max_min = Label(top_left_frame, text=max_min)
+        lbl_max_min.pack(side=TOP)
+
+
+        # Horizontal scroll:
+
+        hor_scroll = Scrollbar(frame, orient='horizontal')
+        hor_scroll.pack(side=BOTTOM, fill='x')
+
+        text = Text(frame, wrap=NONE, xscrollcommand=hor_scroll.set)
+        text.pack(side=TOP)
+
+        for i in range(20):
+            text.insert(END, "hello ")
+
+        one_time_frame = Frame(text)
+        one_time_frame.pack(side=LEFT)
+
+        lbl_time = Label(one_time_frame, text="Now")
+        lbl_time.pack(side=TOP)
+
+        lbl_small_icon = Label(one_time_frame, image=photo, width=30, height=30)
+        lbl_small_icon.pack(side=TOP)
+
+        lbl_small_temp = Label(one_time_frame, text=temp)
+        lbl_small_temp.pack(side=TOP)
+
+        text.insert(END, one_time_frame)
+
+        for i in range(index + 1, len(self.times)):
+
+            t = str(self.times[i])
+            t = int(t[len(t) - 5:len(t) - 3])
+
+            one_time_frame = Frame(text)
+            one_time_frame.pack(side=LEFT)
+
+            lbl_time = Label(one_time_frame, text=str(t) + ":00 ")
+            lbl_time.pack(side=TOP)
+
+            lbl_small_icon = Label(one_time_frame, image=photo, width=30, height=30)
+            lbl_small_icon.pack(side=TOP)
+
+            lbl_small_temp = Label(one_time_frame, text=str(self.temps[i]) + " °C")
+            lbl_small_temp.pack(side=TOP)
+
+            text.insert(END, one_time_frame)
+
+        hor_scroll.config(command=text.xview)
 
         # wind:
         wind = str(self.winds[index]) + " km/h"
-        lbl_wind = Label(text=wind)
-        lbl_wind.place(x=70, y=120)
         print("wind: " + str(wind))
 
         # humidity:
         hum = str(self.hums[index]) + " %"
-        lbl_hum = Label(text=hum)
-        lbl_hum.place(x=10, y=120)
         print("hum: " + str(hum))
 
         # Hourly + sun raise and set
@@ -149,11 +207,11 @@ class Widget:
         daily = ""
         print("Today: " + str(self.min_temps_daily[0]) + " °C, " + str(self.max_temps_daily[0]) + " °C")
         for i in range(1, len(self.days)):
+            if today == 7:
+                today = 0
             weekday = WEEKDAYS[today]
             daily += weekday + ": " + str(self.min_temps_daily[i]) + " °C, " + str(self.max_temps_daily[i]) + " °C\n"
             today += 1
-            if today == 7:
-                today = 0
             i += 1
         print(daily)
         print()

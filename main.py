@@ -13,6 +13,7 @@ result = result.split("(")[1].strip(")")
 result = json.loads(result)
 latitude = result['latitude']
 longitude = result['longitude']
+city = result['city']
 
 # Get weather data using latitude and longitude :
 forecast_url = "https://api.open-meteo.com/v1/forecast?latitude={}&longitude={}&hourly=temperature_2m," \
@@ -23,7 +24,7 @@ forecast = requests.get(forecast_url)
 forecast_data = forecast.content.decode()
 forecast_data = json.loads(forecast_data)
 print(json.dumps(forecast_data, indent=4, sort_keys=True))
-Widget(forecast_data)
+Widget(forecast_data, city)
 
 
 ''' 
