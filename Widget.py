@@ -3,10 +3,12 @@ from tkinter import *
 from PIL import ImageTk, Image
 from datetime import datetime
 
+width = 300
+height = 500
+
 root = tk.Tk()
 root.title("Weather Widget")
-root.geometry('300x500')
-# root.configure(bg='#83C4CE')
+root.geometry(str(width) + "x" + str(height))
 
 frame = Frame(root)
 frame.pack()
@@ -52,6 +54,7 @@ class Widget:
         self.temps = self.data["hourly"]["temperature_2m"]
         self.hums = self.data["hourly"]["relativehumidity_2m"]
         self.winds = self.data["hourly"]["windspeed_10m"]
+        self.precs = self.data["hourly"]["precipitation"]
 
         self.days = self.data["daily"]["time"]
         self.max_temps_daily = self.data["daily"]["temperature_2m_max"]
@@ -59,125 +62,213 @@ class Widget:
         self.sunrise_daily = self.data["daily"]["sunrise"]
         self.sunset_daily = self.data["daily"]["sunset"]
 
+        self.time = format_time()
+        self.index = self.times.index(self.time)
+
         self.draw()
         format_time()
 
     def draw(self):
-        time = format_time()
-        index = self.times.index(time)
-
         # Icon:
-        print()
         img = Image.open("resources/sun.jpeg")
-        img = img.resize((100, 100), Image.ANTIALIAS)
+        img = img.resize((70, 70), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(img)
-        print("Icon: sun.jpeg")
-
         # WMO:
-        wmo = self.wmos[index]
-        print("WMO: " + WMO[wmo])
-
-        # city:
-        print(self.city)
-
+        wmo = self.wmos[self.index]
         # temp:
-        temp = str(self.temps[index]) + " °C"
-        print("temp: " + str(temp))
-
+        temp = str(self.temps[self.index]) + " °C"
         # max and min temp:
-        max = str(self.max_temps_daily[0]) + " °C"
-        print("max: " + str(max))
-        min = str(self.min_temps_daily[0]) + " °C"
-        print("min: " + str(min))
-        max_min = "max.: " + max + ", min.: " + min
+        max_min = "max.: " + str(self.max_temps_daily[0]) + " °C" + ", min.: " + str(self.min_temps_daily[0]) + " °C"
 
+        # Main Frame:
 
-        # Main Frame !!!:
+        top_frame = Frame(frame, width=width, height=200)
+        top_frame.pack(side=TOP)
 
-        top_left_frame = Frame(frame)
-        top_left_frame.pack(side=TOP)
+        lbl_icon = Label(top_frame, image=photo)
+        lbl_city = Label(top_frame, text=self.city)
+        lbl_temp = Label(top_frame, text=temp)
+        lbl_wmo = Label(top_frame, text=WMO[wmo])
+        lbl_max_min = Label(top_frame, text=max_min)
 
-        lbl_icon = Label(top_left_frame, image=photo)
         lbl_icon.pack(side=TOP)
-
-        lbl_city = Label(top_left_frame, text=self.city)
         lbl_city.pack(side=TOP)
-
-        lbl_temp = Label(top_left_frame, text=temp)
         lbl_temp.pack(side=TOP)
-
-        lbl_wmo = Label(top_left_frame, text=WMO[wmo])
         lbl_wmo.pack(side=TOP)
-
-        lbl_max_min = Label(top_left_frame, text=max_min)
         lbl_max_min.pack(side=TOP)
-
 
         # Horizontal scroll:
 
-        hor_scroll = Scrollbar(frame, orient='horizontal')
-        hor_scroll.pack(side=BOTTOM, fill='x')
+        hor_scroll_frame = Frame(frame, highlightbackground="black", highlightthickness=1)
+        hor_scroll_frame.pack(side=TOP, padx=1)
 
-        text = Text(frame, wrap=NONE, xscrollcommand=hor_scroll.set)
-        text.pack(side=TOP)
+        hor_scroll = Scrollbar(hor_scroll_frame, orient='horizontal')
+        hor_scroll.pack(side=TOP, fill='x')
 
-        for i in range(20):
-            text.insert(END, "hello ")
+        hor_text = Text(hor_scroll_frame, wrap=NONE, xscrollcommand=hor_scroll.set, height=8)
+        hor_text.pack(side=TOP)
 
-        one_time_frame = Frame(text)
-        one_time_frame.pack(side=LEFT)
+        time_now = str(self.times[self.index])
+        time_now = int(time_now[len(time_now) - 5:len(time_now) - 3])
 
-        lbl_time = Label(one_time_frame, text="Now")
-        lbl_time.pack(side=TOP)
+        sunrise_today = self.sunrise_daily[0]
+        sunrise_today = sunrise_today[len(sunrise_today) - 5:]
+        s_t_int = int(sunrise_today[len(sunrise_today) - 5:len(sunrise_today) - 3])
+        sunrise_tmrw = self.sunrise_daily[1]
+        sunrise_tmrw = sunrise_tmrw[len(sunrise_tmrw) - 5:]
+        s_tm_int = int(sunrise_tmrw[len(sunrise_tmrw) - 5:len(sunrise_tmrw) - 3])
 
-        lbl_small_icon = Label(one_time_frame, image=photo, width=30, height=30)
-        lbl_small_icon.pack(side=TOP)
+        sunset_today = self.sunset_daily[0]
+        sunset_today = sunset_today[len(sunset_today) - 5:]
+        print(sunset_today)
+        su_t_int = int(sunset_today[len(sunset_today) - 5:len(sunset_today) - 3])
+        print(su_t_int)
+        sunset_tmrw = self.sunset_daily[1]
+        sunset_tmrw = sunset_tmrw[len(sunset_tmrw) - 5:]
+        su_tm_int = int(sunset_tmrw[len(sunset_tmrw) - 5:len(sunset_tmrw) - 3])
 
-        lbl_small_temp = Label(one_time_frame, text=temp)
-        lbl_small_temp.pack(side=TOP)
+        sunrise = s_t_int
+        sunrise_time = sunrise_today
+        sunset = su_t_int
+        sunset_time = sunset_today
+        if time_now > s_t_int:
+            sunrise = s_tm_int
+            sunrise_time = sunrise_tmrw
+        if time_now > su_t_int:
+            sunset = su_tm_int
+            sunset_time = sunset_tmrw
+        print(sunset_time)
 
-        text.insert(END, one_time_frame)
-
-        for i in range(index + 1, len(self.times)):
-
+        str_now = "{0:^10}".format("Now")
+        hor_text.insert(END, str_now)
+        for i in range(self.index + 1, self.index + 24):
             t = str(self.times[i])
             t = int(t[len(t) - 5:len(t) - 3])
+            str_time = "{0:^10}".format(str(t) + ":00 ")
+            hor_text.insert(END, str_time)
+            if sunrise == t:
+                str_sunrise = "{0:^10}".format(sunrise_time)
+                hor_text.insert(END, str_sunrise)
+            if sunset == t:
+                str_sunset = "{0:^10}".format(sunset_time)
+                hor_text.insert(END, str_sunset)
+        hor_text.insert(END, "\n")
 
-            one_time_frame = Frame(text)
-            one_time_frame.pack(side=LEFT)
+        hor_text.image_create(END, image=photo)
+        for i in range(self.index + 1, self.index + 24):
+            t = str(self.times[i])
+            t = int(t[len(t) - 5:len(t) - 3])
+            hor_text.image_create(END, image=photo)
+            if sunrise == t:
+                hor_text.image_create(END, image=photo)
+            if sunset == t:
+                hor_text.image_create(END, image=photo)
+        hor_text.insert(END, "\n")
 
-            lbl_time = Label(one_time_frame, text=str(t) + ":00 ")
-            lbl_time.pack(side=TOP)
+        t = round(int(self.temps[self.index] or 0))
+        str_temp = "{0:^10}".format(str(t) + "°C")
+        hor_text.insert(END, str_temp)
+        for i in range(self.index + 1, self.index + 24):
+            t = str(self.times[i])
+            t = int(t[len(t) - 5:len(t) - 3])
+            te = round(int(self.temps[i] or 0))
+            str_temp = "{0:^10}".format(str(te) + "°C")
+            hor_text.insert(END, str_temp)
+            if sunrise == t:
+                str_sunrise = "{0:^10}".format("Sunrise")
+                hor_text.insert(END, str_sunrise)
+            if sunset == t:
+                str_sunset = "{0:^10}".format("Sunset")
+                hor_text.insert(END, str_sunset)
 
-            lbl_small_icon = Label(one_time_frame, image=photo, width=30, height=30)
-            lbl_small_icon.pack(side=TOP)
+        hor_text.config(state=DISABLED)
+        hor_scroll.config(command=hor_text.xview)
 
-            lbl_small_temp = Label(one_time_frame, text=str(self.temps[i]) + " °C")
-            lbl_small_temp.pack(side=TOP)
+        # Vertical scroll:
 
-            text.insert(END, one_time_frame)
+        ver_scroll_frame = Frame(frame, highlightbackground="black", highlightthickness=1)
+        ver_scroll_frame.pack(side=TOP, padx=1)
 
-        hor_scroll.config(command=text.xview)
+        ver_scroll = Scrollbar(ver_scroll_frame, orient='vertical')
+        ver_scroll.pack(side=RIGHT, fill='y')
+
+        ver_text = Text(ver_scroll_frame, wrap=NONE, borderwidth=1, yscrollcommand=ver_scroll.set, height=5)
+        ver_text.pack(side=TOP)
+
+        ver_text.tag_config('cold', foreground='#ADD8E6')
+        ver_text.tag_config('hot', foreground='#F7B98F')
+
+        str_now = "   " + "{0:^10}".format("Today")
+        ver_text.insert(END, str_now)
+
+        str_min = str(round(int(self.min_temps_daily[0] or 0))) + "°C"
+        str_min = "{0:^7}".format(str_min)
+        ver_text.insert(END, str_min, 'cold')
+
+        img1 = Image.open("resources/coldtohot.jpeg")
+        img1 = img1.resize((70, 10), Image.ANTIALIAS)
+        photo1 = ImageTk.PhotoImage(img1)
+        ver_text.image_create(END, image=photo1)
+
+        str_max = str(round(int(self.max_temps_daily[0] or 0))) + "°C"
+        str_max = "{0:^7}".format(str_max)
+        ver_text.insert(END, str_max, 'hot')
+        ver_text.insert(END, "\n")
+
+        today = datetime.today().weekday() + 1
+        for i in range(1, len(self.days)):
+            if today == 7:
+                today = 0
+            weekday = WEEKDAYS[today]
+
+            str_now = "   " + "{0:^10}".format(weekday)
+            ver_text.insert(END, str_now)
+
+            str_min = str(round(int(self.min_temps_daily[i] or 0))) + "°C"
+            str_min = "{0:^7}".format(str_min)
+            ver_text.insert(END, str_min, 'cold')
+
+            ver_text.image_create(END, image=photo1)
+
+            str_max = str(round(int(self.max_temps_daily[i] or 0))) + "°C"
+            str_max = "{0:^7}".format(str_max)
+            ver_text.insert(END, str_max, 'hot')
+
+            ver_text.insert(END, "\n")
+            today += 1
+            i += 1
+
+        ver_text.config(state=DISABLED)
+        ver_scroll.config(command=ver_text.yview)
+
+        # Everything else frame:
+
+        bottom_frame = Frame(frame)
+        bottom_frame.pack(side=TOP)
 
         # wind:
-        wind = str(self.winds[index]) + " km/h"
-        print("wind: " + str(wind))
+        wind = "Wind speed:\n" + str(self.winds[self.index]) + " km/h"
+        lbl_wind = Label(bottom_frame, text=wind, width=10, height=5, borderwidth=2, relief="groove")
+        lbl_wind.pack(side=LEFT)
 
         # humidity:
-        hum = str(self.hums[index]) + " %"
-        print("hum: " + str(hum))
+        hum = "Humidity:\n" + str(self.hums[self.index]) + " %"
+        lbl_hum = Label(bottom_frame, text=hum, width=10, height=5, borderwidth=2, relief="groove")
+        lbl_hum.pack(side=LEFT, padx=2)
+
+        # precipitation:
+        prec = "Precipitation:\n" + str(self.precs[self.index]) + " %"
+        lbl_prec = Label(bottom_frame, text=prec, width=10, height=5, borderwidth=2, relief="groove")
+        lbl_prec.pack(side=LEFT)
 
         # Hourly + sun raise and set
-        print()
-        print("Scroll right bar:")
         hourly = ""
-        print("Now: " + str(self.temps[index]) + " °C")
         day = 0
         sunrise = self.sunrise_daily[day]
         sunrise = sunrise[len(sunrise) - 5:]
         sunset = self.sunset_daily[day]
         sunset = sunset[len(sunset) - 5:]
-        for i in range(index + 1, len(self.times)):
+        for i in range(self.index + 1, len(self.times)):
             t = str(self.times[i])
             t = int(t[len(t) - 5:len(t) - 3])
             if t == 0:
@@ -196,25 +287,6 @@ class Widget:
             # sunset:
             if int(sunset[:2]) == t:
                 hourly += "\nSUNSET: " + sunset + "\n"
-        print(hourly)
-        print()
-
-        # forecast for 7 days:
-        print()
-        print("Scroll down bar:")
-
-        today = datetime.today().weekday() + 1
-        daily = ""
-        print("Today: " + str(self.min_temps_daily[0]) + " °C, " + str(self.max_temps_daily[0]) + " °C")
-        for i in range(1, len(self.days)):
-            if today == 7:
-                today = 0
-            weekday = WEEKDAYS[today]
-            daily += weekday + ": " + str(self.min_temps_daily[i]) + " °C, " + str(self.max_temps_daily[i]) + " °C\n"
-            today += 1
-            i += 1
-        print(daily)
-        print()
 
         root.mainloop()
 

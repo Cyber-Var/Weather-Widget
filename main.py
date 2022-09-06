@@ -17,8 +17,8 @@ city = result['city']
 
 # Get weather data using latitude and longitude :
 forecast_url = "https://api.open-meteo.com/v1/forecast?latitude={}&longitude={}&hourly=temperature_2m," \
-               "relativehumidity_2m,weathercode,windspeed_10m&daily=temperature_2m_max,temperature_2m_min,sunrise," \
-               "sunset,rain_sum,showers_sum,snowfall_sum,windspeed_10m_max&timezone=auto"\
+               "relativehumidity_2m,precipitation,weathercode,windspeed_10m&daily=temperature_2m_max," \
+               "temperature_2m_min,sunrise,sunset&timezone=auto"\
     .format(latitude, longitude)
 forecast = requests.get(forecast_url)
 forecast_data = forecast.content.decode()
