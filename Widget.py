@@ -29,6 +29,60 @@ WMO = {
     96: "Thunderstorm with slight hail", 99: "Thunderstorm with heavy hail"
 }
 
+PHOTOS = {
+    0: ImageTk.PhotoImage(Image.open("resources/0_d.jpg").resize((70, 70), Image.ANTIALIAS)),
+    1: ImageTk.PhotoImage(Image.open("resources/1_d.jpg").resize((70, 70), Image.ANTIALIAS)),
+    2: ImageTk.PhotoImage(Image.open("resources/1_d.jpg").resize((70, 70), Image.ANTIALIAS)),
+    3: ImageTk.PhotoImage(Image.open("resources/1_d.jpg").resize((70, 70), Image.ANTIALIAS)),
+    4: ImageTk.PhotoImage(Image.open("resources/0_n.jpg").resize((70, 70), Image.ANTIALIAS)),
+    5: ImageTk.PhotoImage(Image.open("resources/1_n.jpg").resize((70, 70), Image.ANTIALIAS)),
+    45: ImageTk.PhotoImage(Image.open("resources/45.jpg").resize((70, 70), Image.ANTIALIAS)),
+    48: ImageTk.PhotoImage(Image.open("resources/45.jpg").resize((70, 70), Image.ANTIALIAS)),
+    51: ImageTk.PhotoImage(Image.open("resources/51.jpg").resize((70, 70), Image.ANTIALIAS)),
+    53: ImageTk.PhotoImage(Image.open("resources/51.jpg").resize((70, 70), Image.ANTIALIAS)),
+    55: ImageTk.PhotoImage(Image.open("resources/55.jpg").resize((70, 70), Image.ANTIALIAS)),
+    56: ImageTk.PhotoImage(Image.open("resources/51.jpg").resize((70, 70), Image.ANTIALIAS)),
+    57: ImageTk.PhotoImage(Image.open("resources/55.jpg").resize((70, 70), Image.ANTIALIAS)),
+    61: ImageTk.PhotoImage(Image.open("resources/55.jpg").resize((70, 70), Image.ANTIALIAS)),
+    63: ImageTk.PhotoImage(Image.open("resources/63.jpg").resize((70, 70), Image.ANTIALIAS)),
+    65: ImageTk.PhotoImage(Image.open("resources/63.jpg").resize((70, 70), Image.ANTIALIAS)),
+    66: ImageTk.PhotoImage(Image.open("resources/55.jpg").resize((70, 70), Image.ANTIALIAS)),
+    67: ImageTk.PhotoImage(Image.open("resources/63.jpg").resize((70, 70), Image.ANTIALIAS)),
+    71: ImageTk.PhotoImage(Image.open("resources/71.jpg").resize((70, 70), Image.ANTIALIAS)),
+    73: ImageTk.PhotoImage(Image.open("resources/73.jpg").resize((70, 70), Image.ANTIALIAS)),
+    75: ImageTk.PhotoImage(Image.open("resources/75.jpg").resize((70, 70), Image.ANTIALIAS)),
+    77: ImageTk.PhotoImage(Image.open("resources/77.jpg").resize((70, 70), Image.ANTIALIAS)),
+    80: ImageTk.PhotoImage(Image.open("resources/80.jpg").resize((70, 70), Image.ANTIALIAS)),
+    81: ImageTk.PhotoImage(Image.open("resources/81.jpg").resize((70, 70), Image.ANTIALIAS)),
+    82: ImageTk.PhotoImage(Image.open("resources/82.jpg").resize((70, 70), Image.ANTIALIAS)),
+    85: ImageTk.PhotoImage(Image.open("resources/85.jpg").resize((70, 70), Image.ANTIALIAS)),
+    86: ImageTk.PhotoImage(Image.open("resources/85.jpg").resize((70, 70), Image.ANTIALIAS)),
+    95: ImageTk.PhotoImage(Image.open("resources/95.jpg").resize((70, 70), Image.ANTIALIAS)),
+    96: ImageTk.PhotoImage(Image.open("resources/95.jpg").resize((70, 70), Image.ANTIALIAS)),
+    99: ImageTk.PhotoImage(Image.open("resources/95.jpg").resize((70, 70), Image.ANTIALIAS)),
+    100: ImageTk.PhotoImage(Image.open("resources/sunrise.jpg").resize((70, 70), Image.ANTIALIAS)),
+    200: ImageTk.PhotoImage(Image.open("resources/sunset.jpg").resize((70, 70), Image.ANTIALIAS)),
+    300: ImageTk.PhotoImage(Image.open("resources/wind.jpg").resize((30, 30), Image.ANTIALIAS)),
+    400: ImageTk.PhotoImage(Image.open("resources/hum.jpg").resize((30, 30), Image.ANTIALIAS)),
+    500: ImageTk.PhotoImage(Image.open("resources/prec.jpg").resize((30, 30), Image.ANTIALIAS)),
+}
+
+'''PHOTOS = {
+    0: ImageTk.PhotoImage(Image.open("resources/0_d.jpg").resize((70, 70), Image.ANTIALIAS)),
+    1: "1", 2: "1", 3: "1",
+    45: "45", 48: "45",
+    51: "51", 53: "51", 55: "55",
+    56: "51", 57: "55",
+    61: "55", 63: "63", 65: "63",
+    66: "55", 67: "63",
+    71: "71", 73: "73", 75: "75",
+    77: "77",
+    80: "80", 81: "81", 82: "82",
+    85: "85", 86: "85",
+    95: "95",
+    96: "95", 99: "95"
+}'''
+
 WEEKDAYS = {
     0: "Monday", 1: "Tuesday", 2: "Wednesday", 3: "Thursday", 4: "Friday",
     5: "Saturday", 6: "Sunday"
@@ -69,23 +123,17 @@ class Widget:
         format_time()
 
     def draw(self):
-        # Icon:
-        img = Image.open("resources/sun.jpeg")
-        img = img.resize((70, 70), Image.ANTIALIAS)
-        photo = ImageTk.PhotoImage(img)
-        # WMO:
-        wmo = self.wmos[self.index]
-        # temp:
-        temp = str(self.temps[self.index]) + " °C"
-        # max and min temp:
-        max_min = "max.: " + str(self.max_temps_daily[0]) + " °C" + ", min.: " + str(self.min_temps_daily[0]) + " °C"
 
         # Main Frame:
 
         top_frame = Frame(frame, width=width, height=200)
         top_frame.pack(side=TOP)
 
-        lbl_icon = Label(top_frame, image=photo)
+        wmo = self.wmos[self.index]
+        temp = str(self.temps[self.index]) + " °C"
+        max_min = "max.: " + str(self.max_temps_daily[0]) + " °C" + ", min.: " + str(self.min_temps_daily[0]) + " °C"
+
+        lbl_icon = Label(top_frame, image=PHOTOS[self.wmos[self.index]])
         lbl_city = Label(top_frame, text=self.city)
         lbl_temp = Label(top_frame, text=temp)
         lbl_wmo = Label(top_frame, text=WMO[wmo])
@@ -120,9 +168,7 @@ class Widget:
 
         sunset_today = self.sunset_daily[0]
         sunset_today = sunset_today[len(sunset_today) - 5:]
-        print(sunset_today)
         su_t_int = int(sunset_today[len(sunset_today) - 5:len(sunset_today) - 3])
-        print(su_t_int)
         sunset_tmrw = self.sunset_daily[1]
         sunset_tmrw = sunset_tmrw[len(sunset_tmrw) - 5:]
         su_tm_int = int(sunset_tmrw[len(sunset_tmrw) - 5:len(sunset_tmrw) - 3])
@@ -137,49 +183,46 @@ class Widget:
         if time_now > su_t_int:
             sunset = su_tm_int
             sunset_time = sunset_tmrw
-        print(sunset_time)
 
-        str_now = "{0:^10}".format("Now")
-        hor_text.insert(END, str_now)
-        for i in range(self.index + 1, self.index + 24):
+        for i in range(self.index, self.index + 24):
             t = str(self.times[i])
             t = int(t[len(t) - 5:len(t) - 3])
-            str_time = "{0:^10}".format(str(t) + ":00 ")
+            ti = str(t) + ":00 "
+            if i == self.index:
+                ti = "Now"
+            str_time = "{0:^10}".format(ti)
             hor_text.insert(END, str_time)
             if sunrise == t:
-                str_sunrise = "{0:^10}".format(sunrise_time)
-                hor_text.insert(END, str_sunrise)
-            if sunset == t:
-                str_sunset = "{0:^10}".format(sunset_time)
-                hor_text.insert(END, str_sunset)
+                str_time = "{0:^10}".format(sunrise_time)
+                hor_text.insert(END, str_time)
+            elif sunset == t:
+                str_time = "{0:^10}".format(sunset_time)
+                hor_text.insert(END, str_time)
         hor_text.insert(END, "\n")
 
-        hor_text.image_create(END, image=photo)
-        for i in range(self.index + 1, self.index + 24):
+        for i in range(self.index, self.index + 24):
             t = str(self.times[i])
             t = int(t[len(t) - 5:len(t) - 3])
-            hor_text.image_create(END, image=photo)
+            hor_text.image_create(END, image=PHOTOS[round(self.wmos[i])])
             if sunrise == t:
-                hor_text.image_create(END, image=photo)
-            if sunset == t:
-                hor_text.image_create(END, image=photo)
+                hor_text.image_create(END, image=PHOTOS[100])
+            elif sunset == t:
+                hor_text.image_create(END, image=PHOTOS[200])
         hor_text.insert(END, "\n")
 
-        t = round(int(self.temps[self.index] or 0))
-        str_temp = "{0:^10}".format(str(t) + "°C")
-        hor_text.insert(END, str_temp)
-        for i in range(self.index + 1, self.index + 24):
+        for i in range(self.index, self.index + 24):
             t = str(self.times[i])
             t = int(t[len(t) - 5:len(t) - 3])
             te = round(int(self.temps[i] or 0))
-            str_temp = "{0:^10}".format(str(te) + "°C")
+            te = str(te) + "°C"
+            str_temp = "{0:^10}".format(te)
             hor_text.insert(END, str_temp)
             if sunrise == t:
-                str_sunrise = "{0:^10}".format("Sunrise")
-                hor_text.insert(END, str_sunrise)
+                str_temp = "{0:^10}".format("Sunrise")
+                hor_text.insert(END, str_temp)
             if sunset == t:
-                str_sunset = "{0:^10}".format("Sunset")
-                hor_text.insert(END, str_sunset)
+                str_temp = "{0:^10}".format("Sunset")
+                hor_text.insert(END, str_temp)
 
         hor_text.config(state=DISABLED)
         hor_scroll.config(command=hor_text.xview)
@@ -246,12 +289,40 @@ class Widget:
         bottom_frame = Frame(frame)
         bottom_frame.pack(side=TOP)
 
-        # wind:
-        wind = "Wind speed:\n" + str(self.winds[self.index]) + " km/h"
-        lbl_wind = Label(bottom_frame, text=wind, width=10, height=5, borderwidth=2, relief="groove")
-        lbl_wind.pack(side=LEFT)
+        lbl_wind = Label(bottom_frame, text="Wind speed:")
+        lbl_wind.grid(row=0, column=0)
+        lbl_wind1 = Label(bottom_frame, image=PHOTOS[300])
+        lbl_wind1.grid(row=1, column=0)
+        lbl_wind2 = Label(bottom_frame, text=str(self.winds[self.index]) + " km/h")
+        lbl_wind2.grid(row=2, column=0)
 
-        # humidity:
+        lbl_hum = Label(bottom_frame, text="Humidity:")
+        lbl_hum.grid(row=0, column=1)
+        lbl_hum1 = Label(bottom_frame, image=PHOTOS[400])
+        lbl_hum1.grid(row=1, column=1)
+        lbl_hum2 = Label(bottom_frame, text=str(round(self.hums[self.index])) + " %")
+        lbl_hum2.grid(row=2, column=1)
+
+        lbl_prec = Label(bottom_frame, text="Precipitation:")
+        lbl_prec.grid(row=0, column=2)
+        lbl_prec1 = Label(bottom_frame, image=PHOTOS[500])
+        lbl_prec1.grid(row=1, column=2)
+        lbl_prec2 = Label(bottom_frame, text=str(self.precs[self.index]) + " %")
+        lbl_prec2.grid(row=2, column=2)
+
+        ''''# wind:
+        canvas_wind = Canvas(frame, width=50, height=50)
+        canvas_wind.pack(side=LEFT)
+
+        canvas_wind.create_text("Wind speed:")
+        canvas_wind.create_image(30, 30, anchor=NW, image=PHOTOS[300])
+        canvas_wind.create_text(str(self.winds[self.index]) + " km/h")'''
+
+        '''wind = "Wind speed:\n" + str(self.winds[self.index]) + " km/h"
+        lbl_wind = Label(bottom_frame, text=wind, width=10, height=5, borderwidth=2, relief="groove")
+        lbl_wind.pack(side=LEFT)'''
+
+        ''''# humidity:
         hum = "Humidity:\n" + str(self.hums[self.index]) + " %"
         lbl_hum = Label(bottom_frame, text=hum, width=10, height=5, borderwidth=2, relief="groove")
         lbl_hum.pack(side=LEFT, padx=2)
@@ -259,54 +330,9 @@ class Widget:
         # precipitation:
         prec = "Precipitation:\n" + str(self.precs[self.index]) + " %"
         lbl_prec = Label(bottom_frame, text=prec, width=10, height=5, borderwidth=2, relief="groove")
-        lbl_prec.pack(side=LEFT)
-
-        # Hourly + sun raise and set
-        hourly = ""
-        day = 0
-        sunrise = self.sunrise_daily[day]
-        sunrise = sunrise[len(sunrise) - 5:]
-        sunset = self.sunset_daily[day]
-        sunset = sunset[len(sunset) - 5:]
-        for i in range(self.index + 1, len(self.times)):
-            t = str(self.times[i])
-            t = int(t[len(t) - 5:len(t) - 3])
-            if t == 0:
-                hourly += "\n"
-                day += 1
-                sunrise = self.sunrise_daily[day]
-                sunrise = sunrise[len(sunrise) - 5:]
-                sunset = self.sunset_daily[day]
-                sunset = sunset[len(sunset) - 5:]
-            if t < 10:
-                hourly += "0"
-            hourly += str(t) + ":00 " + str(self.temps[i]) + " °C, "
-            # sunrise:
-            if int(sunrise[:2]) == t:
-                hourly += "\nSUNRISE: " + sunrise + "\n"
-            # sunset:
-            if int(sunset[:2]) == t:
-                hourly += "\nSUNSET: " + sunset + "\n"
+        lbl_prec.pack(side=LEFT)'''
 
         root.mainloop()
 
     def print_data(self):
         print(self.data)
-
-
-'''
-from tkinter import ttk
-
-tab_control = ttk.Notebook(root)
-
-tab1 = ttk.Frame(tab_control)
-tab2 = ttk.Frame(tab_control)
-tab_control.add(tab1, text="Today")
-tab_control.add(tab2, text="Tomorrow")
-tab_control.pack(expand=1, fill="both")
-
-style = ttk.Style()
-style.configure('My.TLabel', background='00FF00')
-ttk.Label(tab1, text="Latitude:", style='My.TLabel').grid(column=0, row=0, sticky=W, pady=2)
-ttk.Label(tab1, text=self.data['latitude']).grid(column=1, row=0, sticky=W, pady=2)
-'''
