@@ -7,7 +7,6 @@ width = 300
 height = 500
 
 root = tk.Tk()
-root.title("Weather Widget")
 root.geometry(str(width) + "x" + str(height))
 
 frame = Frame(root)
@@ -30,10 +29,10 @@ WMO = {
 }
 
 PHOTOS = {
-    0: ImageTk.PhotoImage(Image.open("resources/0_d.jpg").resize((70, 70), Image.ANTIALIAS)),
-    1: ImageTk.PhotoImage(Image.open("resources/1_d.jpg").resize((70, 70), Image.ANTIALIAS)),
-    2: ImageTk.PhotoImage(Image.open("resources/1_d.jpg").resize((70, 70), Image.ANTIALIAS)),
-    3: ImageTk.PhotoImage(Image.open("resources/1_d.jpg").resize((70, 70), Image.ANTIALIAS)),
+    0: ImageTk.PhotoImage(Image.open("resources/0.jpg").resize((70, 70), Image.ANTIALIAS)),
+    1: ImageTk.PhotoImage(Image.open("resources/1.jpg").resize((70, 70), Image.ANTIALIAS)),
+    2: ImageTk.PhotoImage(Image.open("resources/1.jpg").resize((70, 70), Image.ANTIALIAS)),
+    3: ImageTk.PhotoImage(Image.open("resources/1.jpg").resize((70, 70), Image.ANTIALIAS)),
     4: ImageTk.PhotoImage(Image.open("resources/0_n.jpg").resize((70, 70), Image.ANTIALIAS)),
     5: ImageTk.PhotoImage(Image.open("resources/1_n.jpg").resize((70, 70), Image.ANTIALIAS)),
     45: ImageTk.PhotoImage(Image.open("resources/45.jpg").resize((70, 70), Image.ANTIALIAS)),
@@ -67,22 +66,6 @@ PHOTOS = {
     500: ImageTk.PhotoImage(Image.open("resources/prec.jpg").resize((30, 30), Image.ANTIALIAS)),
 }
 
-'''PHOTOS = {
-    0: ImageTk.PhotoImage(Image.open("resources/0_d.jpg").resize((70, 70), Image.ANTIALIAS)),
-    1: "1", 2: "1", 3: "1",
-    45: "45", 48: "45",
-    51: "51", 53: "51", 55: "55",
-    56: "51", 57: "55",
-    61: "55", 63: "63", 65: "63",
-    66: "55", 67: "63",
-    71: "71", 73: "73", 75: "75",
-    77: "77",
-    80: "80", 81: "81", 82: "82",
-    85: "85", 86: "85",
-    95: "95",
-    96: "95", 99: "95"
-}'''
-
 WEEKDAYS = {
     0: "Monday", 1: "Tuesday", 2: "Wednesday", 3: "Thursday", 4: "Friday",
     5: "Saturday", 6: "Sunday"
@@ -99,9 +82,15 @@ def format_time():
 
 class Widget:
 
-    def __init__(self, data, city):
+    def __init__(self, data, city, old):
+        title = "Weather Widget"
+        if old:
+            title += " (OFFLINE)"
+        root.title(title)
+
         self.data = data
         self.city = city
+        self.old = old
 
         self.wmos = self.data["hourly"]["weathercode"]
         self.times = self.data["hourly"]["time"]
@@ -119,11 +108,41 @@ class Widget:
         self.time = format_time()
         self.index = self.times.index(self.time)
 
+        self.set_time_vars(str(self.times[self.index]))
         self.draw()
-        format_time()
+
+    def set_time_vars(self, time_now):
+        time_now = int(time_now[len(time_now) - 5:len(time_now) - 3])
+
+        sunrise_today = self.sunrise_daily[0]
+        sunrise_today = sunrise_today[len(sunrise_today) - 5:]
+        s_t_int = int(sunrise_today[len(sunrise_today) - 5:len(sunrise_today) - 3])
+        sunrise_tmrw = self.sunrise_daily[1]
+        sunrise_tmrw = sunrise_tmrw[len(sunrise_tmrw) - 5:]
+        s_tm_int = int(sunrise_tmrw[len(sunrise_tmrw) - 5:len(sunrise_tmrw) - 3])
+
+        sunset_today = self.sunset_daily[0]
+        sunset_today = sunset_today[len(sunset_today) - 5:]
+        su_t_int = int(sunset_today[len(sunset_today) - 5:len(sunset_today) - 3])
+        sunset_tmrw = self.sunset_daily[1]
+        sunset_tmrw = sunset_tmrw[len(sunset_tmrw) - 5:]
+        su_tm_int = int(sunset_tmrw[len(sunset_tmrw) - 5:len(sunset_tmrw) - 3])
+
+        self.night = True
+        self.sunrise = s_t_int
+        self.sunrise_time = sunrise_today
+        self.sunset = su_t_int
+        self.sunset_time = sunset_today
+        if time_now > s_t_int:
+            self.night = False
+            self.sunrise = s_tm_int
+            self.sunrise_time = sunrise_tmrw
+        if time_now > su_t_int:
+            self.night = True
+            self.sunset = su_tm_int
+            self.sunset_time = sunset_tmrw
 
     def draw(self):
-
         # Main Frame:
 
         top_frame = Frame(frame, width=width, height=200)
@@ -133,7 +152,18 @@ class Widget:
         temp = str(self.temps[self.index]) + " °C"
         max_min = "max.: " + str(self.max_temps_daily[0]) + " °C" + ", min.: " + str(self.min_temps_daily[0]) + " °C"
 
-        lbl_icon = Label(top_frame, image=PHOTOS[self.wmos[self.index]])
+        if self.old:
+            lbl_old_time = Label(top_frame, text="Data for: " + self.time.replace("T", " "))
+            lbl_old_time.pack(side=TOP)
+
+        img_index = self.wmos[self.index]
+        if self.night:
+            if img_index == 0:
+                img_index = 4
+            elif img_index == 1:
+                img_index = 5
+        lbl_icon = Label(top_frame, image=PHOTOS[img_index])
+
         lbl_city = Label(top_frame, text=self.city)
         lbl_temp = Label(top_frame, text=temp)
         lbl_wmo = Label(top_frame, text=WMO[wmo])
@@ -156,34 +186,6 @@ class Widget:
         hor_text = Text(hor_scroll_frame, wrap=NONE, xscrollcommand=hor_scroll.set, height=8)
         hor_text.pack(side=TOP)
 
-        time_now = str(self.times[self.index])
-        time_now = int(time_now[len(time_now) - 5:len(time_now) - 3])
-
-        sunrise_today = self.sunrise_daily[0]
-        sunrise_today = sunrise_today[len(sunrise_today) - 5:]
-        s_t_int = int(sunrise_today[len(sunrise_today) - 5:len(sunrise_today) - 3])
-        sunrise_tmrw = self.sunrise_daily[1]
-        sunrise_tmrw = sunrise_tmrw[len(sunrise_tmrw) - 5:]
-        s_tm_int = int(sunrise_tmrw[len(sunrise_tmrw) - 5:len(sunrise_tmrw) - 3])
-
-        sunset_today = self.sunset_daily[0]
-        sunset_today = sunset_today[len(sunset_today) - 5:]
-        su_t_int = int(sunset_today[len(sunset_today) - 5:len(sunset_today) - 3])
-        sunset_tmrw = self.sunset_daily[1]
-        sunset_tmrw = sunset_tmrw[len(sunset_tmrw) - 5:]
-        su_tm_int = int(sunset_tmrw[len(sunset_tmrw) - 5:len(sunset_tmrw) - 3])
-
-        sunrise = s_t_int
-        sunrise_time = sunrise_today
-        sunset = su_t_int
-        sunset_time = sunset_today
-        if time_now > s_t_int:
-            sunrise = s_tm_int
-            sunrise_time = sunrise_tmrw
-        if time_now > su_t_int:
-            sunset = su_tm_int
-            sunset_time = sunset_tmrw
-
         for i in range(self.index, self.index + 24):
             t = str(self.times[i])
             t = int(t[len(t) - 5:len(t) - 3])
@@ -192,21 +194,28 @@ class Widget:
                 ti = "Now"
             str_time = "{0:^10}".format(ti)
             hor_text.insert(END, str_time)
-            if sunrise == t:
-                str_time = "{0:^10}".format(sunrise_time)
+            if self.sunrise == t:
+                str_time = "{0:^10}".format(self.sunrise_time)
                 hor_text.insert(END, str_time)
-            elif sunset == t:
-                str_time = "{0:^10}".format(sunset_time)
+            elif self.sunset == t:
+                str_time = "{0:^10}".format(self.sunset_time)
                 hor_text.insert(END, str_time)
         hor_text.insert(END, "\n")
 
         for i in range(self.index, self.index + 24):
             t = str(self.times[i])
+            self.set_time_vars(t)
             t = int(t[len(t) - 5:len(t) - 3])
-            hor_text.image_create(END, image=PHOTOS[round(self.wmos[i])])
-            if sunrise == t:
+            img_index = round(self.wmos[i])
+            if self.night:
+                if img_index == 0:
+                    img_index = 4
+                elif img_index == 1:
+                    img_index = 5
+            hor_text.image_create(END, image=PHOTOS[img_index])
+            if self.sunrise == t:
                 hor_text.image_create(END, image=PHOTOS[100])
-            elif sunset == t:
+            elif self.sunset == t:
                 hor_text.image_create(END, image=PHOTOS[200])
         hor_text.insert(END, "\n")
 
@@ -217,10 +226,10 @@ class Widget:
             te = str(te) + "°C"
             str_temp = "{0:^10}".format(te)
             hor_text.insert(END, str_temp)
-            if sunrise == t:
+            if self.sunrise == t:
                 str_temp = "{0:^10}".format("Sunrise")
                 hor_text.insert(END, str_temp)
-            if sunset == t:
+            if self.sunset == t:
                 str_temp = "{0:^10}".format("Sunset")
                 hor_text.insert(END, str_temp)
 

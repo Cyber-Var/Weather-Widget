@@ -1,6 +1,7 @@
 import requests
 import json
 from Widget import Widget
+import os.path
 
 # Get IP address:
 ip = requests.get('https://checkip.amazonaws.com').text
@@ -16,16 +17,29 @@ longitude = result['longitude']
 city = result['city']
 
 # Get weather data using latitude and longitude :
-forecast_url = "https://api.open-meteo.com/v1/forecast?latitude={}&longitude={}&hourly=temperature_2m," \
+try:
+    forecast_url = "https://api.open-meteo.com/v1/forecast?latitude={}&longitude={}&hourly=temperature_2m," \
                "relativehumidity_2m,precipitation,weathercode,windspeed_10m&daily=temperature_2m_max," \
-               "temperature_2m_min,sunrise,sunset&timezone=auto"\
-    .format(latitude, longitude)
-forecast = requests.get(forecast_url)
-forecast_data = forecast.content.decode()
-forecast_data = json.loads(forecast_data)
-print(json.dumps(forecast_data, indent=4, sort_keys=True))
-Widget(forecast_data, city)
+               "temperature_2m_min,sunrise,sunset&timezone=auto".format(latitude, longitude)
+    forecast = requests.get(forecast_url)
+    forecast_data = forecast.content.decode()
 
+    file = open("json_weather.txt", "w")
+    file.write(forecast_data)
+    file.close()
+
+    forecast_data = json.loads(forecast_data)
+    # print(json.dumps(forecast_data, indent=4, sort_keys=True))
+    Widget(forecast_data, city, False)
+
+except Exception as e:
+    filename = "json_weather.txt"
+    if os.path.isfile(filename):
+        file = open("json_weather.txt", "r")
+        lines = file.readlines()
+        forecast_data = lines[0]
+        forecast_data = json.loads(forecast_data)
+        Widget(forecast_data, city, True)
 
 ''' 
 # API key:
